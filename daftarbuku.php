@@ -7,13 +7,11 @@ if( !isset($_SESSION["login"]) ) {
 }
 
 require 'fungsi/functions.php';
-$row = namauser($_COOKIE);
-$user = $row["username"]; 
-
+require 'tampilusers.php';
 $daftarbuku = query("SELECT * FROM buku");
+notif();
 
-
- ?>
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -27,6 +25,8 @@ $daftarbuku = query("SELECT * FROM buku");
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+  <!-- Toastr -->
+  <link rel="stylesheet" href="plugins/toastr/toastr.min.css">
   <!-- Ionicons -->
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
   <!-- DataTables -->
@@ -294,8 +294,8 @@ $daftarbuku = query("SELECT * FROM buku");
               <!-- /.card-header -->
               <div class="card-body">
                 <!-- Tambah data mahasiswa -->
-              <a href="tambahbuku.php" type="submit" name="tambah" class="btn btn-success">
-              <i class="nav-icon fas fa-plus"></i> Tambah Daftar Buku</a>
+              <button class="btn btn-success" data-toggle="modal" data-target="#tambah-buku">
+              <i class="nav-icon fas fa-plus"></i> Tambah Daftar Buku</button>
               <br><br>
 
                 <table id="example1" class="table table-bordered table-striped">
@@ -320,15 +320,139 @@ $daftarbuku = query("SELECT * FROM buku");
                     <td><?= $buku["penulis"]; ?></td>
                     <td><?= $buku["penerbit"]; ?></td>                     
                     <td>
-                      <a href="ubahbuku.php?id=<?= $buku["id"]; ?>" class="btn btn-sm btn-success">
-                      <i class="nav-icon fas fa-pen"></i> Ubah</a>
-                      <a href="hapusbuku.php?id=<?= $buku["id"]; ?>" class="btn btn-sm btn-danger">
-                      <i class="nav-icon fas fa-trash"></i> Hapus</a>
+                      <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#ubahbuku-<?= $buku['id']; ?>">
+                      <i class="nav-icon fas fa-pen"></i> Ubah</button>
+                      <button  class="btn btn-sm btn-danger" data-toggle="modal" data-target="#hapusbuku-<?= $buku['id']; ?>">
+                      <i class="nav-icon fas fa-trash"></i> Hapus</button>
                     </td>
                   </tr>
                   <?php $i++; ?>
+
+                  <!-- modal hapus buku -->
+                  <div class="modal fade" id="hapusbuku-<?= $buku['id']; ?>">
+                  <div class="modal-dialog">
+                    <div class="modal-content bg-danger">
+                      <div class="modal-header">
+                        <h4 class="modal-title"><i class="icon fas fa-exclamation-triangle"></i> Hapus Buku !!</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <label>Apakah anda yakin ingin menghapus Buku yang Berjudul :</label>
+                        <p><?= $buku["judul"]; ?></p>
+                      </div>
+                      <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-outline-light" data-dismiss="modal">Close</button>
+                        <a href="hapusbuku.php?id=<?= $buku['id']; ?>" class="btn btn-outline-light">Hapus</a>
+                      </div>
+                    </div>
+                    <!-- /.modal-content -->
+                  </div>
+                  <!-- /.modal-dialog -->
+                </div>
+                <!-- /.modal -->
+
+                  <!-- modal ubah buku -->
+                  <div class="modal fade" id="ubahbuku-<?= $buku['id']; ?>">
+                    <div class="modal-dialog modal-lg">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h4 class="modal-title">Ubah Data Buku</h4>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        
+                        <form action="ubahbuku.php" method="post" enctype="multipart/form-data">
+                        <div class="card-body">
+                          <input type="hidden" name="id" value="<?= $buku["id"]; ?>">                  
+                          
+                          <div class="form-group">
+                            <label for="judul">Judul Buku</label>
+                            <input type="text" class="form-control" name="judul" id="judul" value="<?= $buku["judul"]; ?>" required>
+                          </div>
+
+                          <div class="form-group">
+                            <label for="kategori">Kategori</label>
+                            <input type="text" class="form-control" name="kategori" id="kategori" value="<?= $buku["kategori"]; ?>" required>
+                          </div>
+
+                          <div class="form-group">
+                            <label for="penulis">Penulis</label>
+                            <input type="text" class="form-control" name="penulis" id="penulis" value="<?= $buku["penulis"]; ?>" required>
+                          </div>
+
+                          <div class="form-group">
+                            <label for="penerbit">Penerbit</label>
+                            <input type="text" class="form-control" name="penerbit" id="penerbit" value="<?= $buku["penerbit"]; ?>" required>
+                          </div>
+                            
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" name="submit" class="btn btn-success">Ubah Data</button>
+                          </div>
+                        </form>
+                        
+                      </div>
+                      <!-- /.modal-content -->
+                    </div>
+                    <!-- /.modal-dialog -->
+                  </div>
+                  <!-- /.modal -->
+
                   <?php endforeach; ?>
 
+              <!-- modal tambah buku -->
+              <div class="modal fade" id="tambah-buku">
+                  <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h4 class="modal-title"><i class="nav-icon fas fa-book"></i> Tambahkan Buku</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+
+                      <form action="tambahbuku.php" method="post" enctype="multipart/form-data">
+                      <div class="card-body">
+
+                        <div class="form-group">
+                          <label for="judul">Judul Buku</label>
+                          <input type="text" class="form-control" name="judul" id="judul" placeholder="Judul Buku" required>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="kategori">Kategori</label>
+                          <input type="text" class="form-control" name="kategori" id="kategori" placeholder="Kategori" required>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="penulis">Penulis</label>
+                          <input type="text" class="form-control" name="penulis" id="penulis" placeholder="Penulis" required>
+                        </div>
+
+                        <div class="form-group">
+                          <label for="penerbit">Penerbit</label>
+                          <input type="text" class="form-control" name="penerbit" id="penerbit" placeholder="Penerbit" required>
+                        </div>
+                          
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                          <button type="submit" class="btn btn-success" name="submit">Tambahkan Buku</button>
+                        </div>
+                      </div>
+                      <!-- /.card-body -->
+                    </form>
+                      
+                    </div>
+                    <!-- /.modal-content -->
+                  </div>
+                  <!-- /.modal-dialog -->
+                </div>
+                <!-- /.modal -->
                   
                   </tbody>
                 </table>
@@ -364,6 +488,10 @@ $daftarbuku = query("SELECT * FROM buku");
 <script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
 <script src="plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
 <script src="plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+<!-- Toastr -->
+<script src="plugins/toastr/toastr.min.js"></script>
+<!-- Notifikasi dati Toastr -->
+<script src="dist/js/notif.js"></script>
 <!-- AdminLTE App -->
 <script src="dist/js/adminlte.min.js"></script>
 <!-- AdminLTE for demo purposes -->

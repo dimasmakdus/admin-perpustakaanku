@@ -7,29 +7,11 @@ if( !isset($_SESSION["login"]) ) {
 }
 
 require 'fungsi/functions.php';
+require 'tampilusers.php';
 $mahasiswa = query("SELECT * FROM mahasiswa");
+notif();
+?>
 
-$row = namauser($_COOKIE);
-$user = $row["username"]; 
-
-
-// jumlah total mahasiswa
-$data_mhs = mysqli_query($conn, "SELECT * FROM mahasiswa");
-$jumlah_mhs = mysqli_num_rows($data_mhs);
-
-// jumlah total buku
-$data_buku = mysqli_query($conn, "SELECT * FROM buku");
-$jumlah_buku = mysqli_num_rows($data_buku);
-
-// jumlah pinjaman
-$data_pinjaman = mysqli_query($conn, "SELECT * FROM peminjaman");
-$jumlah_pinjaman = mysqli_num_rows($data_pinjaman);
-
-// jumlah pengembalian
-$data_kembali = mysqli_query($conn, "SELECT * FROM pengembalian");
-$jumlah_kembali = mysqli_num_rows($data_kembali);
-
- ?>
 <!DOCTYPE html>
 <html lang="en">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
@@ -42,6 +24,8 @@ $jumlah_kembali = mysqli_num_rows($data_kembali);
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+  <!-- Toastr -->
+  <link rel="stylesheet" href="plugins/toastr/toastr.min.css">
   <!-- Ionicons -->
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
   <!-- DataTables -->
@@ -402,13 +386,103 @@ $jumlah_kembali = mysqli_num_rows($data_kembali);
                     <td><?= $mhs["fakultas"]; ?></td>
                     <td><?= $mhs["jurusan"]; ?></td>
                     <td>
-                      <a href="ubahmhs.php?id=<?= $mhs["id"]; ?>" class="btn btn-sm btn-success">
-                      <i class="nav-icon fas fa-pen"></i> Ubah</a>
-                      <a href="hapus.php?id=<?= $mhs["id"]; ?>" class="btn btn-sm btn-danger">
-                      <i class="nav-icon fas fa-trash"></i> Hapus</a>
+                      <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#ubahmhs-<?= $mhs['id']; ?>">
+                      <i class="nav-icon fas fa-pen"></i> Ubah</button>
+                      <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#hapusmhs-<?= $mhs["id"]; ?>">
+                      <i class="nav-icon fas fa-trash"></i> Hapus</button>
                     </td>
                   </tr>
                   <?php $i++; ?>
+
+                  <!-- modal hapus mahasiswa -->
+                  <div class="modal fade" id="hapusmhs-<?= $mhs["id"]; ?>">
+                    <div class="modal-dialog">
+                      <div class="modal-content bg-danger">
+                        <div class="modal-header">
+                          <h4 class="modal-title"><i class="icon fas fa-exclamation-triangle"></i> Hapus Mahasiswa !!</h4>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <label>Apakah anda yakin ingin menghapus Nama Mahasiswa :</label>
+                          <p><?= $mhs["nim"]; ?> - <?= $mhs["nama"]; ?></p>
+                        </div>
+                        <div class="modal-footer justify-content-between">
+                          <button type="button" class="btn btn-outline-light" data-dismiss="modal">Close</button>
+                          <a href="hapus.php?id=<?= $mhs['id'] ?>" class="btn btn-outline-light">Hapus</a>
+                        </div>
+                      </div>
+                      <!-- /.modal-content -->
+                    </div>
+                    <!-- /.modal-dialog -->
+                  </div>
+
+                  <!-- modal ubah mahasiswa -->
+                    <div class="modal fade" id="ubahmhs-<?= $mhs['id']; ?>">
+                      <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h4 class="modal-title">Large Modal</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          
+                          <form action="ubahmhs.php" method="post" enctype="multipart/form-data">
+                          <div class="card-body">
+                            <input type="hidden" name="id" value="<?= $mhs["id"]; ?>">
+                            <input type="hidden" name="gambarLama" value="<?= $mhs["gambar"]; ?>">
+                            
+                            <div class="form-group">
+                              <label for="nama">Nama Lengkap</label>
+                              <input type="text" class="form-control" name="nama" id="nama" value="<?= $mhs["nama"]; ?>">
+                            </div>
+
+                            <div class="form-group">
+                              <label for="nim">NIM</label>
+                              <input type="text" class="form-control" name="nim" id="nim" required value="<?= $mhs["nim"]; ?>">
+                            </div>
+
+                            <div class="form-group">
+                              <label for="fakultas">Fakultas</label>
+                              <input type="text" class="form-control" name="fakultas" id="fakultas" required value="<?= $mhs["fakultas"]; ?>">
+                            </div>
+
+                            <div class="form-group">
+                              <label for="jurusan">Jurusan</label>
+                              <input type="text" class="form-control" name="jurusan" id="jurusan" value="<?= $mhs["jurusan"]; ?>">
+                            </div>
+
+
+                            <div class="form-group">
+                              <label for="gambar">Ganti Foto Anda</label>
+                              <div class="input-group">
+                                <div class="custom-file">
+                                  <input type="file" class="custom-file-input" name="gambar" id="gambar">
+                                  <label class="custom-file-label" for="gambar">Pilih file</label>
+                                </div>
+                              </div>
+                              </div>
+                        
+                                <img src="foto/<?= $mhs['gambar'];  ?>" width="65">
+                            
+                            </div>
+
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                              <button type="submit" name="submit" class="btn btn-success">Simpan</button>
+                            </div>
+
+                          </form>
+
+                        </div>
+                        <!-- /.modal-content -->
+                      </div>
+                      <!-- /.modal-dialog -->
+                    </div>
+
+
                   <?php endforeach; ?>
                                     
                   </tbody>
@@ -445,6 +519,10 @@ $jumlah_kembali = mysqli_num_rows($data_kembali);
 <script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
 <script src="plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
 <script src="plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+<!-- Toastr -->
+<script src="plugins/toastr/toastr.min.js"></script>
+<!-- Notifikasi dati Toastr -->
+<script src="dist/js/notif.js"></script>
 <!-- AdminLTE App -->
 <script src="dist/js/adminlte.min.js"></script>
 <!-- AdminLTE for demo purposes -->

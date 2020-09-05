@@ -44,8 +44,8 @@ if( isset($_POST["register"]) ) {
     <div class="card-body register-card-body">
       <p class="login-box-msg">Daftar Menjadi Anggota Baru</p>
 
-      <form action="" method="post">        
-        <div class="input-group mb-3">
+      <form id="registrasi" action="" method="post">        
+        <div class="input-group mb-3 form-group">
           <input type="text" class="form-control" name="username" id="username" placeholder="Username">
           <div class="input-group-append">
             <div class="input-group-text">
@@ -53,7 +53,7 @@ if( isset($_POST["register"]) ) {
             </div>
           </div>
         </div>
-        <div class="input-group mb-3">
+        <div class="input-group mb-3 form-group">
           <input type="email" class="form-control" name="email" id="email" placeholder="Email">
           <div class="input-group-append">
             <div class="input-group-text">
@@ -61,7 +61,7 @@ if( isset($_POST["register"]) ) {
             </div>
           </div>
         </div>
-        <div class="input-group mb-3">
+        <div class="input-group mb-3 form-group">
           <input type="password" class="form-control" name="password" id="password" placeholder="Password">
           <div class="input-group-append">
             <div class="input-group-text">
@@ -69,7 +69,7 @@ if( isset($_POST["register"]) ) {
             </div>
           </div>
         </div>
-        <div class="input-group mb-3">
+        <div class="input-group mb-3 form-group">
           <input type="password" class="form-control" name="password2" id="password2" placeholder="Retype password">
           <div class="input-group-append">
             <div class="input-group-text">
@@ -79,10 +79,10 @@ if( isset($_POST["register"]) ) {
         </div>
         <div class="row">
           <div class="col-8">
-            <div class="icheck-primary">
-              <input type="checkbox" id="agreeTerms" name="terms" value="agree" required>
+            <div class="icheck-primary form-group">
+              <input type="checkbox" id="agreeTerms" name="terms">
               <label for="agreeTerms">
-               I agree to the <a href="#">terms</a>
+               I agree to the terms</a>
               </label>
             </div>
           </div>
@@ -94,7 +94,7 @@ if( isset($_POST["register"]) ) {
         </div>
       </form>
 
-      <a href="login.html" class="text-center">I already have a membership</a>
+      <a href="login.php" class="text-center">I already have a membership</a>
     </div>
     <!-- /.form-box -->
   </div><!-- /.card -->
@@ -105,7 +105,68 @@ if( isset($_POST["register"]) ) {
 <script src="plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
 <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- jquery-validation -->
+<script src="plugins/jquery-validation/jquery.validate.min.js"></script>
+<script src="plugins/jquery-validation/additional-methods.min.js"></script>
 <!-- AdminLTE App -->
 <script src="dist/js/adminlte.min.js"></script>
+
+<script>
+$(function () {
+  $.validator.setDefaults({
+    
+  });
+  $('#registrasi').validate({
+    rules: {
+      username: {
+        required: true,
+        minlength: 5        
+      },
+      email: {
+        required: true,
+        email: true,        
+      },
+      password: {
+        required: true,
+        minlength: 5
+      },
+      password2: {
+        required: true,
+      },
+      terms: {
+        required: true
+      },      
+    },
+    messages: {
+      username: {
+        required: "Buat username terlebih dahulu"               
+      },
+      email: {
+        required: "Masukkan email anda terlebih dahulu",
+        email: "Tolong masukkan email yang benar"        
+      },
+      password: {
+        required: "Buat password terlebih dahulu",
+        minlength: "Password anda kurang dari 5 karakter"
+      },
+      password2: {
+        required: "Tolong Masukkan pasword konfirmasi!",
+      },
+      terms: "Please accept our terms"
+    },
+    errorElement: 'span',
+    errorPlacement: function (error, element) {
+      error.addClass('invalid-feedback');
+      element.closest('.form-group').append(error);
+    },
+    highlight: function (element, errorClass, validClass) {
+      $(element).addClass('is-invalid');
+    },
+    unhighlight: function (element, errorClass, validClass) {
+      $(element).removeClass('is-invalid');
+    }
+  });
+});
+</script>
 </body>
 </html>

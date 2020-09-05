@@ -8,20 +8,19 @@ if( !isset($_SESSION["login"]) ) {
 
 require 'fungsi/functions.php';
 
-
 $id = $_GET["id"];
 
 if( hapus($id) > 0 ) {
+	setcookie('hapusBerhasil', 'berhasil',time()+5);
 	echo "
-			<script>
-				alert('data berhasil dihapus');
+			<script>				
 				document.location.href = 'datamhs.php';
 			</script>
 		";
 }else {
+	setcookie('hapusGagal', 'gagal',time()+5);
 	echo "
-			<script>
-				alert('data gagal dihapus');
+			<script>				
 				document.location.href = 'datamhs.php';
 			</script>
 		";

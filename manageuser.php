@@ -7,8 +7,7 @@ if( !isset($_SESSION["login"]) ) {
 }
 
 require 'fungsi/functions.php';
-$row = namauser($_COOKIE);
-$user = $row["username"]; 
+require 'tampilusers.php';
 
 $users = query("SELECT * FROM user");
 

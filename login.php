@@ -91,16 +91,16 @@ if( isset($_POST["login"]) ) {
     <div class="card-body login-card-body">
       <p class="login-box-msg">Silahkan Masukan Username & Password</p>
      
-      <form action="" method="post">
-        <div class="input-group mb-3">
-          <input type="text" class="form-control" name="username" id="username" placeholder="Username">
+      <form id="quickForm" action="" method="post" >
+        <div class="input-group mb-3 form-group">
+          <input type="text" class="form-control" name="username" id="username" placeholder="Username" >
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-user"></span>
             </div>
           </div>
         </div>
-        <div class="input-group mb-3">
+        <div class="input-group mb-3 form-group">
           <input type="password" class="form-control" name="password" id="password" placeholder="Password">
           <div class="input-group-append">
             <div class="input-group-text">
@@ -110,10 +110,13 @@ if( isset($_POST["login"]) ) {
         </div>
         
           <?php if( isset($error) ) : ?>
-            <small class="badge badge-danger"><i class="icon fas fa-exclamation-triangle"></i>
-            username / password salah!
-            </small>
+            <div class="alert alert-danger alert-dismissible">
+                  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                  <i class="icon fas fa-exclamation-triangle"></i>Username / Password Salah!
+                </div>
           <?php endif; ?>
+
+          
 
         <div class="row">
           <div class="col-8">
@@ -145,7 +148,51 @@ if( isset($_POST["login"]) ) {
 <script src="plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
 <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- jquery-validation -->
+<script src="plugins/jquery-validation/jquery.validate.min.js"></script>
+<script src="plugins/jquery-validation/additional-methods.min.js"></script>
 <!-- AdminLTE App -->
 <script src="dist/js/adminlte.min.js"></script>
+<!-- validation -->
+<script>
+$(function () {
+  $.validator.setDefaults({
+    
+  });
+  $('#quickForm').validate({
+    rules: {
+      username: {
+        required: true,        
+      },
+      password: {
+        required: true,
+        minlength: 5
+      },      
+    },
+    messages: {
+      username: {
+        required: "Tolong masukkan username terlebih dahulu",        
+      },
+      password: {
+        required: "Tolong masukkan password terlebih dahulu",
+        minlength: "Password anda kurang dari 5 karakter"
+      },
+      
+    },
+    errorElement: 'span',
+    errorPlacement: function (error, element) {
+      error.addClass('invalid-feedback');
+      element.closest('.form-group').append(error);
+    },
+    highlight: function (element, errorClass, validClass) {
+      $(element).addClass('is-invalid');
+    },
+    unhighlight: function (element, errorClass, validClass) {
+      $(element).removeClass('is-invalid');
+    }
+  });
+});
+</script>
+
 </body>
 </html>

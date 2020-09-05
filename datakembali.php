@@ -7,6 +7,7 @@ if( !isset($_SESSION["login"]) ) {
 }
 
 require 'fungsi/functions.php';
+require 'tampilusers.php';
 
 // ambil data di url
 $id = $_GET["id"];
