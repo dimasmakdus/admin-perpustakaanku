@@ -4,6 +4,21 @@
 // mysqli_connect("nama_host_database", "username_mysql", "passw_mysql", "nama_database" );
 $conn = mysqli_connect("localhost", "root", "", "perpustakaan");
 
+// jumlah total mahasiswa
+$data_mhs = mysqli_query($conn, "SELECT * FROM mahasiswa");
+$jumlah_mhs = mysqli_num_rows($data_mhs);
+
+// jumlah total buku
+$data_buku = mysqli_query($conn, "SELECT * FROM buku");
+$jumlah_buku = mysqli_num_rows($data_buku);
+
+// jumlah pinjaman
+$data_pinjaman = mysqli_query($conn, "SELECT * FROM peminjaman");
+$jumlah_pinjaman = mysqli_num_rows($data_pinjaman);
+
+// jumlah pengembalian
+$data_kembali = mysqli_query($conn, "SELECT * FROM pengembalian");
+$jumlah_kembali = mysqli_num_rows($data_kembali);
 
 function query($query) {
 	global $conn;
@@ -293,5 +308,27 @@ function namauser($user) {
 
 	return $row;
 }
+
+function notif() {
+
+	if (isset($_COOKIE["ubahBerhasil"])) {
+	    echo "<div class='ubahBerhasil'></div>";
+	} else if(isset($_COOKIE["ubahGagal"])) {
+	    echo "<div class='ubahGagal'></div>";
+	}
+
+	if (isset($_COOKIE["tambahBerhasil"])) {
+	    echo "<div class='tambahBerhasil'></div>";
+	} else if (isset($_COOKIE["tambahGagal"])) {
+	    echo "<div class='tambahGagal'></div>";
+	}
+
+	if (isset($_COOKIE["hapusBerhasil"])) {
+	    echo "<div class='hapusBerhasil'></div>";
+	} else if (isset($_COOKIE["hapusGagal"])) {
+	    echo "<div class='hapusGagal'></div>";
+	}
+}
+
 
 ?>
